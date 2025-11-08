@@ -53,3 +53,6 @@ Open your browser and navigate to `http://localhost:5173` (or the address shown 
 -   `npm run build`: Builds the application for production.
 -   `npm run lint`: Lints the code using ESLint.
 -   `npm run preview`: Serves the production build locally.
+
+<img width="1433" height="779" alt="image" src="https://github.com/user-attachments/assets/7de559b0-9c40-4552-b94b-d8c0c473c8f5" />
+
