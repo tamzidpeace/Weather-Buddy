@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import ForecastList from "./components/ForecastList";
 import SearchForm from "./components/SearchForm";
@@ -13,6 +14,93 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
+  async function fetchGeocode(city) {
+    const geoResponse = await fetch(
+      `https://geocoding-api.open-meteo.com/v1/search?name=${city}&count=1`
+    );
+
+    if (!geoResponse.ok) {
+      throw new Error(
+        "Could not look up that city right now. Please try again."
+      );
+    }
+
+    const geoData = await geoResponse.json();
+    const location = geoData.results?.[0];
+
+    if (!location) {
+      throw new Error("City not found. Try another place name.");
+    }
+
+    return location;
+  }
+
+  async function fetchWeatherData(location) {
+    const params = new URLSearchParams({
+      latitude: location.latitude,
+      longitude: location.longitude,
+      current:
+        "temperature_2m,relative_humidity_2m,wind_speed_10m,apparent_temperature,weather_code",
+      daily: "weather_code,temperature_2m_max,temperature_2m_min",
+      timezone: "auto",
+    });
+
+    const weatherResponse = await fetch(
+      `https://api.open-meteo.com/v1/forecast?${params}`
+    );
+
+    if (!weatherResponse.ok) {
+      throw new Error(
+        "Unable to fetch weather data right now. Please retry later."
+      );
+    }
+
+    return weatherResponse.json();
+  }
+
+  function updateWeatherState(weatherData, location) {
+    const { current, daily } = weatherData;
+
+    if (!current) {
+      throw new Error("Weather data unavailable for that city.");
+    }
+
+    const humidity =
+      typeof current.relative_humidity_2m === "number"
+        ? current.relative_humidity_2m
+        : 0;
+    const windSpeed =
+      typeof current.wind_speed_10m === "number" ? current.wind_speed_10m : 0;
+    const temperature =
+      typeof current.temperature_2m === "number" ? current.temperature_2m : 0;
+    const apparentTemperature =
+      typeof current.apparent_temperature === "number"
+        ? current.apparent_temperature
+        : temperature;
+
+    setWeather({
+      location: `${location.name}${
+        location.country_code ? `, ${location.country_code}` : ""
+      }`,
+      temperature,
+      apparentTemperature,
+      humidity,
+      windSpeed,
+      description: describeWeatherCode(current.weather_code),
+      code: current.weather_code ?? 0,
+    });
+
+    const days =
+      daily?.time?.map((date, index) => ({
+        date,
+        max: daily.temperature_2m_max?.[index] ?? 0,
+        min: daily.temperature_2m_min?.[index] ?? 0,
+        code: daily.weather_code?.[index] ?? 0,
+      })) ?? [];
+
+    setForecast(days.slice(0, 5));
+  }
+
   async function fetchWeather(city) {
     if (!city) return;
 
@@ -20,83 +108,9 @@ function App() {
     setError("");
 
     try {
-      const geoResponse = await fetch(
-        `https://geocoding-api.open-meteo.com/v1/search?name=${city}&count=1`
-      );
-
-      if (!geoResponse.ok) {
-        throw new Error(
-          "Could not look up that city right now. Please try again."
-        );
-      }
-
-      const geoData = await geoResponse.json();
-      const location = geoData.results?.[0];
-
-      if (!location) {
-        throw new Error("City not found. Try another place name.");
-      }
-
-      const params = new URLSearchParams({
-        latitude: location.latitude,
-        longitude: location.longitude,
-        current:
-          "temperature_2m,relative_humidity_2m,wind_speed_10m,apparent_temperature,weather_code",
-        daily: "weather_code,temperature_2m_max,temperature_2m_min",
-        timezone: "auto",
-      });
-
-      const weatherResponse = await fetch(
-        `https://api.open-meteo.com/v1/forecast?${params}`
-      );
-
-      if (!weatherResponse.ok) {
-        throw new Error(
-          "Unable to fetch weather data right now. Please retry later."
-        );
-      }
-
-      const weatherJson = await weatherResponse.json();
-      const current = weatherJson.current;
-
-      if (!current) {
-        throw new Error("Weather data unavailable for that city.");
-      }
-
-      const humidity =
-        typeof current.relative_humidity_2m === "number"
-          ? current.relative_humidity_2m
-          : 0;
-      const windSpeed =
-        typeof current.wind_speed_10m === "number" ? current.wind_speed_10m : 0;
-      const temperature =
-        typeof current.temperature_2m === "number" ? current.temperature_2m : 0;
-      const apparentTemperature =
-        typeof current.apparent_temperature === "number"
-          ? current.apparent_temperature
-          : temperature;
-
-      setWeather({
-        location: `${location.name}${
-          location.country_code ? `, ${location.country_code}` : ""
-        }`,
-        temperature,
-        apparentTemperature,
-        humidity,
-        windSpeed,
-        description: describeWeatherCode(current.weather_code),
-        code: current.weather_code ?? 0,
-      });
-
-      const days =
-        weatherJson.daily?.time?.map((date, index) => ({
-          date,
-          max: weatherJson.daily.temperature_2m_max?.[index] ?? 0,
-          min: weatherJson.daily.temperature_2m_min?.[index] ?? 0,
-          code: weatherJson.daily.weather_code?.[index] ?? 0,
-        })) ?? [];
-
-      setForecast(days.slice(0, 5));
+      const location = await fetchGeocode(city);
+      const weatherData = await fetchWeatherData(location);
+      updateWeatherState(weatherData, location);
     } catch (fetchError) {
       setError(fetchError.message || "Something went wrong. Please try again.");
       setWeather(null);
