@@ -1,3 +1,9 @@
 
-## Retrieve geographical coordinates 
+### Retrieve geographical coordinates 
 GET https://geocoding-api.open-meteo.com/v1/search?name=dhaka&count=1
+
+
+### Fetch weather forecast data
+
+GET https://api.open-meteo.com/v1/forecast?latitude=23.8103&longitude=90.4125&current=temperature_2m,relative_humidity_2m,wind_speed_10m,apparent_temperature,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto
+

@@ -4,7 +4,7 @@ function WeatherCard({ weather }) {
   const { location, temperature, description, humidity, windSpeed } = weather
 
   return (
-    <section className="mt-10 rounded-3xl border border-slate-800/70 bg-gradient-to-br from-slate-900/80 via-slate-900/40 to-slate-900/80 p-8 text-center shadow-2xl shadow-sky-900/40">
+    <section className="mt-10 rounded-3xl border border-slate-800/70 bg-linear-to-br from-slate-900/80 via-slate-900/40 to-slate-900/80 p-8 text-center shadow-2xl shadow-sky-900/40">
       <p className="text-sm uppercase tracking-[0.3em] text-slate-400">Now in</p>
       <h2 className="mt-2 text-3xl font-bold text-white">{location}</h2>
 
