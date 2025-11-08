@@ -10,7 +10,6 @@ function App() {
   const [cityInput, setCityInput] = useState(DEFAULT_CITY)
   const [searchRequest, setSearchRequest] = useState({
     city: DEFAULT_CITY,
-    id: 0,
   })
   const [weather, setWeather] = useState(null)
   const [forecast, setForecast] = useState([])
@@ -20,8 +19,6 @@ function App() {
   useEffect(() => {
     if (!searchRequest.city) return
 
-    const controller = new AbortController()
-
     async function fetchWeather() {
       setIsLoading(true)
       setError('')
@@ -29,7 +26,6 @@ function App() {
       try {
         const geoResponse = await fetch(
           `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(searchRequest.city)}&count=1&language=en&format=json`,
-          { signal: controller.signal },
         )
 
         if (!geoResponse.ok) {
@@ -51,9 +47,7 @@ function App() {
           timezone: 'auto',
         })
 
-        const weatherResponse = await fetch(`https://api.open-meteo.com/v1/forecast?${params}`, {
-          signal: controller.signal,
-        })
+        const weatherResponse = await fetch(`https://api.open-meteo.com/v1/forecast?${params}`)
 
         if (!weatherResponse.ok) {
           throw new Error('Unable to fetch weather data right now. Please retry later.')
@@ -92,10 +86,6 @@ function App() {
 
         setForecast(days.slice(0, 5))
       } catch (fetchError) {
-        if (fetchError.name === 'AbortError') {
-          return
-        }
-
         setError(fetchError.message || 'Something went wrong. Please try again.')
         setWeather(null)
         setForecast([])
@@ -105,8 +95,6 @@ function App() {
     }
 
     fetchWeather()
-
-    return () => controller.abort()
   }, [searchRequest])
 
   function handleSubmit(event) {
@@ -118,10 +106,7 @@ function App() {
       return
     }
 
-    setSearchRequest((prev) => ({
-      city: trimmed,
-      id: prev.id + 1,
-    }))
+    setSearchRequest({ city: trimmed })
   }
 
   return (
