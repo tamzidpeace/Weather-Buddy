@@ -1,16 +1,55 @@
-# React + Vite
+# Weather App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is a simple weather application built with React and Vite. It allows you to search for a city and get the current weather and a 5-day forecast.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+-   Search for weather by city name.
+-   Display current weather conditions.
+-   Display a 5-day weather forecast.
+-   Responsive design.
 
-## React Compiler
+## Technologies Used
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+-   [React](https://react.dev/)
+-   [Vite](https://vitejs.dev/)
+-   [Tailwind CSS](https://tailwindcss.com/)
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Prerequisites
+
+-   Node.js (v18 or later)
+-   npm
+
+### Installation
+
+1.  Clone the repository:
+    ```sh
+    git clone https://github.com/your-username/weather-app2.git
+    ```
+2.  Navigate to the project directory:
+    ```sh
+    cd weather-app2
+    ```
+3.  Install the dependencies:
+    ```sh
+    npm install
+    ```
+
+### Running the Application
+
+To start the development server, run:
+
+```sh
+npm run dev
+```
+
+Open your browser and navigate to `http://localhost:5173` (or the address shown in your terminal).
+
+## Available Scripts
+
+-   `npm run dev`: Starts the development server.
+-   `npm run build`: Builds the application for production.
+-   `npm run lint`: Lints the code using ESLint.
+-   `npm run preview`: Serves the production build locally.
